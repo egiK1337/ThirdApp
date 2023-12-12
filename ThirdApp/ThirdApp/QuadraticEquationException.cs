@@ -9,9 +9,9 @@ namespace ThirdApp
     public class QuadraticEquationException : Exception
     {
         public Severity Severity { get; set; }
-        public Dictionary<string, string> Data { get; set; }
+        public Dictionary<string, int> Data { get; set; }
 
-        public QuadraticEquationException(string message, Severity severity, Dictionary<string, string> data)
+        public QuadraticEquationException(string message, Severity severity, Dictionary<string, int> data)
             : base(message)
         {
             Severity = severity;

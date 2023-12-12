@@ -1,82 +1,105 @@
 ﻿
+using System.Numerics;
+
 namespace ThirdApp
 {
     internal class Program
     {
-        public static void FormatData(string message, Severity severity, IDictionary<string, string> data)
+        public static void FormatData(string message, Severity severity, IDictionary<string, int> data)
         {
-            if(severity == Severity.Error)
+            switch (severity)
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.ForegroundColor = ConsoleColor.White;
+                case Severity.Error:
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+                case Severity.Warning:
+                    Console.BackgroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+                case Severity.OverFlow:
+                    Console.BackgroundColor = ConsoleColor.Green;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("Можно вводить значение в диапазоне −2 147 483 648 до 2 147 483 647");
+                    Console.WriteLine();
+                    break;
             }
-            if(severity == Severity.Warning) 
-            {
-                Console.BackgroundColor = ConsoleColor.Yellow;
-                Console.ForegroundColor = ConsoleColor.Black;
-            }
-
-            for (int i = 0; i < 5; i++)
-            {
-                Console.Write("-----");
-            }
-
+            Console.Write(new string('-', 50));
             Console.WriteLine();
             Console.WriteLine(message);
-
-            for (int i = 0; i < 5; i++)
-            {
-                Console.Write("-----");
-            }
-
+            Console.Write(new string('-', 50));
             Console.WriteLine();
-
             foreach (var item in data)
             {
                 Console.WriteLine($"{item.Key} = {item.Value}");
             }
-
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
         }
 
-        public static Dictionary<string, string> InputProcess()
+        public static Dictionary<string, int> InputProcess()
         {
-            var data = new Dictionary<string, string>();
+            var data = new Dictionary<string, int>();
+            var enteredValues = new Dictionary<string, string>();
 
             Console.WriteLine("Введите числовое значение переменной a, не равное 0");
-            data["a"] = Console.ReadLine();
-
+            enteredValues["a"] = Console.ReadLine();
             Console.WriteLine("Введите числовое значение переменной b");
-            data["b"] = Console.ReadLine();
-
+            enteredValues["b"] = Console.ReadLine();
             Console.WriteLine("Введите числовое значение переменной c");
-            data["c"] = Console.ReadLine();
+            enteredValues["c"] = Console.ReadLine();
 
-            if (!int.TryParse(data["a"], out _) || int.Parse(data["a"]) == 0)
+            foreach (var value in enteredValues)
             {
+                Console.WriteLine($"{value.Key} = {value.Value}");
+            }
+
+            var checkA = BigInteger.TryParse(enteredValues["a"], out var valueA);
+            if (valueA > int.MaxValue)
+            {
+                throw new InputException("Неверное значение переменной а", Severity.OverFlow, data);
+            }
+            int.Parse(enteredValues["a"]);
+            var checkB = BigInteger.TryParse(enteredValues["b"], out var valueB);
+            if (valueB > int.MaxValue)
+            {
+                throw new InputException("Неверное значение переменной а", Severity.OverFlow, data);
+            }
+            int.Parse(enteredValues["b"]);
+            var checkC = BigInteger.TryParse(enteredValues["c"], out var valueC);
+            if (valueC > int.MaxValue)
+            {
+                throw new InputException("Неверное значение переменной а", Severity.OverFlow, data);
+            }
+            int.Parse(enteredValues["c"]);
+
+            if (!checkA || valueA == 0)
+            {
+               
                 throw new InputException("Неверное значение переменной а", Severity.Error, data);
             }
-            if (!int.TryParse(data["b"], out _))
-            {
+            if (!checkB)
+            {             
                 throw new InputException("Неверное значение переменной b", Severity.Error, data);
             }
-            if (!int.TryParse(data["c"], out _))
+            if (!checkC)
             {
                 throw new InputException("Неверное значение переменной c", Severity.Error, data);
             }
+
+            data["a"] = (int)valueA;
+            data["b"] = (int)valueB;
+            data["c"] = (int)valueC;
             return data;
         }
-
-        static void SolvingQuadraticEquation(Dictionary<string, string> data)
+        static void SolvingQuadraticEquation(Dictionary<string, int> data)
         {
-            int.TryParse(data["a"], out var a);
-            int.TryParse(data["b"], out var b);
-            int.TryParse(data["c"], out var c);
+            var a = data["a"];
+            var b = data["b"];
+            var c = data["c"];
 
             double d = (b * b) - (4 * a * c);
-
             var x1 = 0.0;
             var x2 = 0.0;
 
@@ -96,27 +119,15 @@ namespace ThirdApp
                 Console.WriteLine($"Квадратное уравнение имеет два корня x1 = {x1}, x1 = {x2}");
             }
         }
-
         static void Main()
         {
             Console.WriteLine("Необходимо решить квадратное уравнение вида: a * x ^ 2 + b * x + c = 0");
-
             Dictionary<string, string> dt = new Dictionary<string, string>();
-
             while (true)
             {
                 try
                 {
-                    var inputProcess = InputProcess();
-
-                    if (inputProcess.Count == 3)
-                    {
-                        foreach (var item in inputProcess)
-                        {
-                            dt.Add(item.Key, item.Value);
-                        }
-                        SolvingQuadraticEquation(dt);
-                    }
+                    SolvingQuadraticEquation(InputProcess());
                 }
                 catch (InputException e)
                 {
@@ -126,7 +137,7 @@ namespace ThirdApp
                 {
                     FormatData(f.Message, f.Severity, f.Data);
                 }
-                dt.Clear();
+
             }
         }
     }

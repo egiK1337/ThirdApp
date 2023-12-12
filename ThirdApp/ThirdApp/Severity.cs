@@ -9,6 +9,7 @@ namespace ThirdApp
     public enum Severity
     {
         Warning,
-        Error
+        Error,
+        OverFlow
     }
 }

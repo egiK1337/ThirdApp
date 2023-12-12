@@ -9,9 +9,9 @@ namespace ThirdApp
     public class InputException : Exception
     {
         public Severity Severity { get; set; }
-        public Dictionary<string, string> Data { get; set; }
+        public Dictionary<string, int> Data { get; set; }
 
-        public InputException(string message, Severity severity, Dictionary<string, string> data) 
+        public InputException(string message, Severity severity, Dictionary<string, int> data) 
             : base(message)
         {
             Severity = severity;
